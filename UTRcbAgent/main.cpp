@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <unistd.h>
 
 const std::vector<std::string> split(const std::string& s, const char& c){
 
@@ -89,7 +90,11 @@ int main(int argc, char *argv[])
         my_frame->SetFrame(my_id, my_data);
         std::cout <<  my_frame->ToString() <<std::endl;
 
-        rc->SendFrame(*my_frame);
+        for(int i = 0; i < 1000000L; i++){
+
+            rc->SendFrame(*my_frame);
+            ::usleep(1000);
+        }
 
         std::getline(my_inf, my_line);
     }

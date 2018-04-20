@@ -24,11 +24,5 @@ INCLUDEPATH += $$PWD/../BaseCAN
 
 #unix:!macx: PRE_TARGETDEPS += $$OUT_PWD/../BaseCAN/libBaseCAN.a
 
-unix:!macx: LIBS += -L$$OUT_PWD/../RotorControl/ -lRotorControl
-
-INCLUDEPATH += $$PWD/../RotorControl
-DEPENDPATH += $$PWD/../RotorControl
-
-unix:!macx: PRE_TARGETDEPS += $$OUT_PWD/../RotorControl/libRotorControl.a
 
 

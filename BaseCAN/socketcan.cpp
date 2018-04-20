@@ -1,3 +1,4 @@
+#include "basecan.h"
 #include "socketcan.h"
 
 #include <net/if.h>
@@ -77,7 +78,7 @@ void SocketCAN::WriteFrame(CANFrame8& frame){
 
     frame.GetData(my_frame.data);
 
-    if(::write(m_sock, &my_frame, sizeof(struct can_frame)) == -1){
+    if((::write(m_sock, &my_frame, sizeof(struct can_frame))) == -1){
 
         throw CANException("error while writing CAN frame");
     }

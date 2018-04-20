@@ -24,13 +24,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         basecan.cpp \
     canframe8.cpp \
-    socketcan.cpp
+    socketcan.cpp \
+    rotorcontrol.cpp
 
 HEADERS += \
         basecan.h \
     canexception.h \
     canframe8.h \
-    socketcan.h
+    socketcan.h \
+    rotorcontrol.h
 unix {
     target.path = /usr/lib
     INSTALLS += target
