@@ -7,6 +7,8 @@
 #include <sstream>
 #include <unistd.h>
 
+#include <QDir>
+
 const std::vector<std::string> split(const std::string& s, const char& c){
 
     std::string buff{""};
@@ -64,7 +66,7 @@ int main(int argc, char *argv[])
 
     std::ifstream my_inf;
 
-    my_inf.open("/home/fmi/Development/Input.txt");
+    my_inf.open((QDir::homePath() + "/Development/Input.txt").toStdString());
 
     if(!my_inf){
 
@@ -90,10 +92,9 @@ int main(int argc, char *argv[])
         my_frame->SetFrame(my_id, my_data);
         std::cout <<  my_frame->ToString() <<std::endl;
 
-        for(int i = 0; i < 1000000L; i++){
+        for(int i = 0; i < 1000L; i++){
 
             rc->SendFrame(*my_frame);
-            ::usleep(1000);
         }
 
         std::getline(my_inf, my_line);
