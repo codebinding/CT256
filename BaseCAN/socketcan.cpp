@@ -1,6 +1,9 @@
 #include "basecan.h"
 #include "socketcan.h"
 
+#include <linux/can.h>
+#include <linux/can/raw.h>
+
 #include <net/if.h>
 #include <sys/types.h>
 #include <sys/socket.h>

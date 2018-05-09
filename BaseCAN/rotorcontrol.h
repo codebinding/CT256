@@ -45,7 +45,7 @@ private:
     void ProduceRecvQueue();
     static void* ThreadProduceRecvQueue(void* this_pointer);
     pthread_t m_thread_rq_producer;
-    bool m_rq_producer_runing;
+    bool m_rq_producer_running;
 };
 
 #endif // ROTORCONTROL_H

@@ -3,9 +3,6 @@
 
 #include "basecan.h"
 
-#include <linux/can.h>
-#include <linux/can/raw.h>
-
 class SocketCAN : public BaseCAN
 {
 public:

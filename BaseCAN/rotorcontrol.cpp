@@ -14,10 +14,12 @@ RotorControl::~RotorControl(){
     m_sq_consumer_running = false;
 
     m_rq_consumer_running = false;
-    m_rq_producer_runing = false;
+    m_rq_producer_running = false;
+    m_sq_consumer_running = false;
 
     pthread_join(m_thread_rq_consumer, NULL);
     pthread_join(m_thread_sq_consumer, NULL);
+    pthread_join(m_thread_rq_producer, NULL);
 
     pthread_mutex_destroy(&m_sq_lock);
     pthread_mutex_destroy(&m_rq_lock);
@@ -71,7 +73,7 @@ void RotorControl::Initialize(){
         throw CANException("error while creating thread 'ThreadConsumeRecvQueue");
     }
 
-    m_rq_producer_runing = true;
+    m_rq_producer_running = true;
     if(::pthread_create(&m_thread_rq_producer, NULL, &ThreadProduceRecvQueue, this) != 0){
 
         throw CANException("error while creating thread 'ThreadProudceRecvQueue'");
@@ -162,9 +164,9 @@ void* RotorControl::ThreadConsumeRecvQueue(void *this_pointer){
 
 void RotorControl::ProduceRecvQueue(){
 
-    while(m_rq_producer_runing){
+    CANFrame8 *my_frame = new CANFrame8();
 
-        CANFrame8 *my_frame = new CANFrame8();
+    while(m_rq_producer_running){
 
         m_can->ReadFrame(*my_frame);
 
