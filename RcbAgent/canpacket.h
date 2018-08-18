@@ -1,21 +1,23 @@
-#ifndef CANFRAME8_H
-#define CANFRAME8_H
+#ifndef CANPACKET_H
+#define CANPACKET_H
 
 #include "inttypes.h"
+
+#include <linux/can.h>
 #include <string>
 
-class CANFrame8
+class CANPacket
 {
 public:
-    CANFrame8();
-    CANFrame8(uint32_t id, uint64_t data);
-    virtual ~CANFrame8();
+
+    const unsigned char DataLength = 8;
 
     uint32_t GetId();
     void GetData(uint8_t data[8]);
 
     void SetId(uint32_t id);
     void SetData(uint8_t data[8]);
+    void SetRawPacket(can_frame frame);
 
     void SetFrame(uint32_t id, uint8_t data[8]);
     void SetFrame(uint32_t id, uint32_t data[8]);
@@ -31,4 +33,4 @@ protected:
     //    [0]        [1]        [2]        [3]        [4]        [5]        [6]        [7]
 };
 
-#endif // CANFRAME8_H
+#endif // CANPACKET_H

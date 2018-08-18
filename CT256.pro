@@ -3,4 +3,6 @@ TEMPLATE = subdirs
 SUBDIRS += \
     BaseCAN \
     RotorControl \
-    UTRcbAgent
+    UTRcbAgent \
+    HPS2FPGA \
+    RcbAgent

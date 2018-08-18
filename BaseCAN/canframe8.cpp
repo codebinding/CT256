@@ -8,7 +8,7 @@ CANFrame8::CANFrame8(){
 
 }
 
-CANFrame8::CANFrame8(uint16_t id, uint64_t data){
+CANFrame8::CANFrame8(uint32_t id, uint64_t data){
 
     SetFrame(id, data);
 }
@@ -17,7 +17,7 @@ CANFrame8::~CANFrame8(){
 
 }
 
-uint16_t CANFrame8::GetId(){
+uint32_t CANFrame8::GetId(){
 
     return m_id;
 }
@@ -30,7 +30,7 @@ void CANFrame8::GetData(uint8_t data[]){
     }
 }
 
-void CANFrame8::SetId(uint16_t id){
+void CANFrame8::SetId(uint32_t id){
 
     m_id = id;
 }
@@ -57,7 +57,7 @@ std::string CANFrame8::ToString(){
     return oss.str();
 }
 
-void CANFrame8::SetFrame(uint16_t id, uint8_t data[8]){
+void CANFrame8::SetFrame(uint32_t id, uint8_t data[]){
 
     m_id = id;
 
@@ -67,7 +67,17 @@ void CANFrame8::SetFrame(uint16_t id, uint8_t data[8]){
     }
 }
 
-void CANFrame8::SetFrame(uint16_t id, uint64_t data){
+void CANFrame8::SetFrame(uint32_t id, uint32_t data[]){
+
+    m_id = id;
+
+    for(int i = 0; i < 8; i++){
+
+        m_data[i] = data[i];
+    }
+}
+
+void CANFrame8::SetFrame(uint32_t id, uint64_t data){
 
     m_id = id;
 
@@ -77,7 +87,7 @@ void CANFrame8::SetFrame(uint16_t id, uint64_t data){
     }
 }
 
-void CANFrame8::SetFrame(uint16_t id, uint8_t start_bit, uint8_t bit_length, uint64_t data){
+void CANFrame8::SetFrame(uint32_t id, uint8_t start_bit, uint8_t bit_length, uint64_t data){
 
     if( start_bit > 63 ){
 
