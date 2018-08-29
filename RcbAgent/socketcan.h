@@ -19,9 +19,9 @@ public:
     void WriteCAN(CANPacket& packet);
     void ReadCAN(CANPacket& packet);
 
+    void PutResponse(CANPacket &packet);
+    void PutResponse(std::vector<CANPacket> &packets);
     void GetRequest(CANPacket& packet);
-    void SetResponse(CANPacket &packet);
-    void SetResponse(std::vector<CANPacket> &packets);
 
 private:
     int m_sock;
@@ -29,8 +29,8 @@ private:
     void openCAN(char* interface);
     bool isValid() const { return m_sock != -1; }
 
-    std::queue<CANPacket> *m_RequestQueue;
-    std::queue<CANPacket> *m_ResponseQueue;
+    std::queue<CANPacket> m_RequestQueue;
+    std::queue<CANPacket> m_ResponseQueue;
 
     pthread_mutex_t m_RequestMutex;
     pthread_mutex_t m_ResponseMutex;

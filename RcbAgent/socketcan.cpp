@@ -23,17 +23,17 @@ SocketCAN::~SocketCAN(){
     m_ReadRequestRunning = false;
     m_WriteResponseRunning = false;
 
-    pthread_join(m_ThreadReadRequest, nullptr);
-    pthread_join(m_ThreadWriteResponse, nullptr);
+    ::pthread_join(m_ThreadReadRequest, nullptr);
+    ::pthread_join(m_ThreadWriteResponse, nullptr);
 
-    pthread_mutex_destroy(&m_RequestMutex);
-    pthread_mutex_destroy(&m_ResponseMutex);
+    ::pthread_mutex_destroy(&m_RequestMutex);
+    ::pthread_mutex_destroy(&m_ResponseMutex);
 
-    pthread_cond_destroy(&m_RequestReadySignal);
-    pthread_cond_destroy(&m_ResponseReadySignal);
+    ::pthread_cond_destroy(&m_RequestReadySignal);
+    ::pthread_cond_destroy(&m_ResponseReadySignal);
 
-    delete m_RequestQueue;
-    delete m_ResponseQueue;
+    //delete m_RequestQueue;
+    //delete m_ResponseQueue;
 
     if( isValid() ){
 
@@ -45,8 +45,8 @@ void SocketCAN::Init(){
 
     openCAN(const_cast<char *>("can0"));
 
-    m_RequestQueue = new std::queue<CANPacket>();
-    m_ResponseQueue = new std::queue<CANPacket>();
+    //m_RequestQueue = new std::queue<CANPacket>();
+    //m_ResponseQueue = new std::queue<CANPacket>();
 
     // Initialize mutex and signals of the 'request queue'
     ::pthread_mutex_init(&m_RequestMutex, nullptr);
@@ -140,18 +140,18 @@ void SocketCAN::readRequest(){
 
     CANPacket myPacket;
 
-    while(m_ReadRequestRunning){
+    while (m_ReadRequestRunning){
 
         ReadCAN(myPacket);
 
-        pthread_mutex_lock(&m_RequestMutex);
+        ::pthread_mutex_lock(&m_RequestMutex);
 
-        m_RequestQueue->push(myPacket);
+        m_RequestQueue.push(myPacket);
 
         std::cout << myPacket.ToString() << std::endl;
 
-        pthread_cond_signal(&m_RequestReadySignal);
-        pthread_mutex_unlock(&m_RequestMutex);
+        ::pthread_cond_signal(&m_RequestReadySignal);
+        ::pthread_mutex_unlock(&m_RequestMutex);
     }
 }
 
@@ -162,55 +162,66 @@ void *SocketCAN::threadReadRequest(void *thisPointer){
     return nullptr;
 }
 
-void SocketCAN::SetResponse(CANPacket &packet){
+void SocketCAN::PutResponse(CANPacket &packet){
 
-    pthread_mutex_lock(&m_ResponseMutex);
+    ::pthread_mutex_lock(&m_ResponseMutex);
 
-    m_ResponseQueue->push(packet);
+    m_ResponseQueue.push(packet);
 
-    pthread_cond_signal(&m_ResponseReadySignal);
+    ::pthread_cond_signal(&m_ResponseReadySignal);
 
-    pthread_mutex_unlock(&m_ResponseMutex);
+    ::pthread_mutex_unlock(&m_ResponseMutex);
 }
 
-void SocketCAN::SetResponse(std::vector<CANPacket> &packets){
+void SocketCAN::PutResponse(std::vector<CANPacket> &packets){
 
-    pthread_mutex_lock(&m_ResponseMutex);
+    ::pthread_mutex_lock(&m_ResponseMutex);
 
-    for( std::vector<CANPacket>::iterator it=packets.begin();it!=packets.end();it++){
+    for (std::vector<CANPacket>::iterator it=packets.begin();it!=packets.end();it++){
 
-        m_ResponseQueue->push(*it);
+        m_ResponseQueue.push(*it);
     }
 
-    pthread_cond_signal(&m_ResponseReadySignal);
+    ::pthread_cond_signal(&m_ResponseReadySignal);
 
-    pthread_mutex_unlock(&m_ResponseMutex);
+    ::pthread_mutex_unlock(&m_ResponseMutex);
+}
+
+void SocketCAN::GetRequest(CANPacket& packet){
+
+    ::pthread_mutex_lock(&m_RequestMutex);
+
+    packet = m_RequestQueue.front();
+    m_RequestQueue.pop();
+
+    ::pthread_cond_signal(&m_RequestReadySignal);
+
+    ::pthread_mutex_unlock(&m_RequestMutex);
 }
 
 void SocketCAN::writeResponse(){
 
-    while(m_WriteResponseRunning) {
+    while (m_WriteResponseRunning) {
 
-        pthread_mutex_lock(&m_ResponseMutex);
+        ::pthread_mutex_lock(&m_ResponseMutex);
 
-        while(m_ResponseQueue->empty()) {
+        while (m_ResponseQueue.empty()) {
 
-            pthread_cond_wait(&m_ResponseReadySignal, &m_ResponseMutex);
+            ::pthread_cond_wait(&m_ResponseReadySignal, &m_ResponseMutex);
         }
 
-        while(!m_ResponseQueue->empty()) {
+        while (!m_ResponseQueue.empty()) {
 
-            CANPacket myPacket = m_ResponseQueue->front();
+            CANPacket myPacket = m_ResponseQueue.front();
 
             WriteCAN(myPacket);
 
-            m_ResponseQueue->pop();
+            m_ResponseQueue.pop();
 
             std::cout << myPacket.ToString() << std::endl;
-            // ::usleep(1000);
         }
 
-        pthread_mutex_unlock(&m_ResponseMutex);
+        ::pthread_mutex_unlock(&m_ResponseMutex);
     }
 }
 

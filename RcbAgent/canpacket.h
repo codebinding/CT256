@@ -1,8 +1,6 @@
 #ifndef CANPACKET_H
 #define CANPACKET_H
 
-#include "inttypes.h"
-
 #include <linux/can.h>
 #include <string>
 
@@ -10,7 +8,7 @@ class CANPacket
 {
 public:
 
-    const unsigned char DataLength = 8;
+    uint8_t DataLength = 8;
 
     uint32_t GetId();
     void GetData(uint8_t data[8]);

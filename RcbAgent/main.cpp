@@ -1,9 +1,12 @@
 #include "socketcan.h"
 #include "exception.h"
+#include "fpgabridge.h"
 
 #include <iostream>
 #include <ctime>
 #include <chrono>
+
+#include "scanparameter.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -14,9 +17,6 @@ int main()
 
     try {
 
-        uint8_t *a = new uint8_t(10);
-
-        cout << sizeof (a) << endl;
         //mySocket.Init();
 
         //time_t Now = system_clock::to_time_t(system_clock::now());
@@ -30,9 +30,25 @@ int main()
 
         cout << duration_cast<microseconds>(system_clock::now() - start).count() << "ms" << endl;
 
+        typedef duration<int, ratio<365*24*60*60>> year;
+        system_clock::duration epoch = system_clock::now().time_since_epoch();
+
+        cout << setw(2) << setfill('0') << duration_cast<year>(epoch).count() - 30;
+        //cout << duration_cast<milliseconds>(t.time_since_epoch()).count() - duration_cast<seconds>(t.time_since_epoch()).count()*1000 << endl;
+
+        FSS enumFss = FSS::Large;
+        unsigned uintFss = 5;
+
+        cout << "enum value: " << enumFss << " uint value: " << static_cast<unsigned>(enumFss) << endl;
+
+        enumFss = static_cast<FSS>(uintFss);
+        cout << "uint value: " << uintFss << " enum value: " << enumFss << endl;
+
     } catch (Exception e) {
 
         cout << e.Message() << endl;
     }
 
 }
+
+

@@ -10,11 +10,15 @@ SOURCES += \
         main.cpp \
     fpgabridge.cpp \
     canpacket.cpp \
-    socketcan.cpp
+    socketcan.cpp \
+    log.cpp \
+    scanparameter.cpp
 
 HEADERS += \
     register.h \
     fpgabridge.h \
     exception.h \
     canpacket.h \
-    socketcan.h
+    socketcan.h \
+    log.h \
+    scanparameter.h

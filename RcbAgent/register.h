@@ -1,7 +1,7 @@
 #ifndef REGISTER_H
 #define REGISTER_H
 
-#include <stdint.h>
+#include <cstdint>
 
 struct reg_t {
 
