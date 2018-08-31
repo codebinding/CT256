@@ -1,5 +1,7 @@
 #include "scanparameter.h"
 
+uint16_t ScanParameter::PreviousPacket;
+
 uint8_t ScanParameter::Kv;
 uint16_t ScanParameter::Ma;
 
@@ -18,7 +20,7 @@ bool ScanParameter::XDitherEnabled;
 bool ScanParameter::ZDitherEnabled;
 
 uint32_t ScanParameter::IntegrationLimit;
-unsigned ScanParameter::IntegrationTime;
+uint32_t ScanParameter::IntegrationTime;
 
-unsigned ScanParameter::TriggerMode;
+uint8_t ScanParameter::TriggerMode;
 uint32_t ScanParameter::TriggerPosition;

@@ -12,7 +12,8 @@ SOURCES += \
     canpacket.cpp \
     socketcan.cpp \
     log.cpp \
-    scanparameter.cpp
+    scanparameter.cpp \
+    rcbpacket.cpp
 
 HEADERS += \
     register.h \
@@ -21,4 +22,5 @@ HEADERS += \
     canpacket.h \
     socketcan.h \
     log.h \
-    scanparameter.h
+    scanparameter.h \
+    rcbpacket.h

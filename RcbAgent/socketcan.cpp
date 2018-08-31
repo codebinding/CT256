@@ -162,24 +162,28 @@ void *SocketCAN::threadReadRequest(void *thisPointer){
     return nullptr;
 }
 
-void SocketCAN::PutResponse(CANPacket &packet){
+void SocketCAN::PutResponse(RCBPacket &packet){
 
     ::pthread_mutex_lock(&m_ResponseMutex);
 
-    m_ResponseQueue.push(packet);
+    CANPacket myPacket;
+    packet.EncodeCANPacket(myPacket);
+    m_ResponseQueue.push(myPacket);
 
     ::pthread_cond_signal(&m_ResponseReadySignal);
 
     ::pthread_mutex_unlock(&m_ResponseMutex);
 }
 
-void SocketCAN::PutResponse(std::vector<CANPacket> &packets){
+void SocketCAN::PutResponse(std::vector<RCBPacket> &packets){
 
     ::pthread_mutex_lock(&m_ResponseMutex);
 
-    for (std::vector<CANPacket>::iterator it=packets.begin();it!=packets.end();it++){
+    CANPacket myPacket;
+    for (std::vector<RCBPacket>::iterator it=packets.begin();it!=packets.end();it++){
 
-        m_ResponseQueue.push(*it);
+        it->EncodeCANPacket(myPacket);
+        m_ResponseQueue.push(myPacket);
     }
 
     ::pthread_cond_signal(&m_ResponseReadySignal);
@@ -187,11 +191,13 @@ void SocketCAN::PutResponse(std::vector<CANPacket> &packets){
     ::pthread_mutex_unlock(&m_ResponseMutex);
 }
 
-void SocketCAN::GetRequest(CANPacket& packet){
+void SocketCAN::GetRequest(RCBPacket &packet){
 
     ::pthread_mutex_lock(&m_RequestMutex);
 
-    packet = m_RequestQueue.front();
+    CANPacket myCANPacket = m_RequestQueue.front();
+    packet.DecodeCANPacket(myCANPacket);
+
     m_RequestQueue.pop();
 
     ::pthread_cond_signal(&m_RequestReadySignal);

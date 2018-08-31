@@ -11,6 +11,8 @@ public:
 
     ScanParameter();
 
+    static uint16_t PreviousPacket;
+
     static uint8_t Kv;
     static uint16_t Ma;
 
@@ -29,9 +31,9 @@ public:
     static bool ZDitherEnabled;
 
     static uint32_t IntegrationLimit;
-    static unsigned IntegrationTime;
+    static uint32_t IntegrationTime;
 
-    static unsigned TriggerMode;
+    static uint8_t TriggerMode;
     static uint32_t TriggerPosition;
 };
 #endif // SCANPARAMETER_H

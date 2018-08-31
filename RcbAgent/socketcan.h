@@ -2,6 +2,7 @@
 #define SOCKETCAN_H
 
 #include "canpacket.h"
+#include "rcbpacket.h"
 
 #include <pthread.h>
 #include <queue>
@@ -19,9 +20,9 @@ public:
     void WriteCAN(CANPacket& packet);
     void ReadCAN(CANPacket& packet);
 
-    void PutResponse(CANPacket &packet);
-    void PutResponse(std::vector<CANPacket> &packets);
-    void GetRequest(CANPacket& packet);
+    void PutResponse(RCBPacket &packet);
+    void PutResponse(std::vector<RCBPacket> &packets);
+    void GetRequest(RCBPacket& packet);
 
 private:
     int m_sock;
