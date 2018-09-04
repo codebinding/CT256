@@ -60,7 +60,12 @@ public:
     uint16_t Command;
     uint16_t Parameter;
     bool Completed;
-    uint64_t Data;
+
+    union{
+
+        uint64_t Data64;
+        uint8_t Data8[8];
+    };
 };
 
 #endif // RCBPACKET_H

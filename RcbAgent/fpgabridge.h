@@ -33,17 +33,26 @@ public:
     void ReadRegister(uint16_t offset, uint64_t& value);
     void WriteRegister(uint16_t offset, uint64_t value);
 
-    void Init();
-    void Start();
-    void Stop();
+    void AdbAuthenticateBegin(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second);
+    void AdbAuthenticateStatus();
+
+    void HvgWaitOnCommunication(unsigned sec);
+    void HvgSetTime(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second);
+    void HvgInitialize();
+    void HvgWaitOnStandby(unsigned sec);
+    void HvgModeData();
+    void HvgDummyExposure();
+    void HvgWaitPreparedScan(unsigned sec);
+    void HvgEndScan();
+    void HvgWaitScanData(unsigned sec);
+    void HvgArm();
+    void HvgExpose();
+    void HvgReset();
+    void HvgReboot();
+    void HvgRequestVersion();
+    void HvgWaitVersion(unsigned sec);
+
     void Prepare();
-    void Expose();
-    void Lock();
-    void Unlock();
-    void Reset();
-    void Abort();
-    void Warmup();
-    void EndScan();
 
 private:
     void* m_BridgeMap;
@@ -61,8 +70,7 @@ private:
     bool m_IsLocked;
     bool m_IsPrepared;
 
-    void AdbAuthenticateBegin(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second);
-    void AdbAuthenticateStatus();
+
 
     void AdbSendCommand(std::vector<uint8_t>& request, std::vector<uint8_t>& response);
 
@@ -80,20 +88,7 @@ private:
 
     void TcuSendCommand(std::vector<uint8_t>& request, std::vector<uint8_t>& response);
 
-    void HvgWaitOnCommunication(unsigned sec);
-    void HvgSetTime(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second);
-    void HvgInitialize();
-    void HvgWaitOnStandby(unsigned sec);
-    void HvgModeData();
-    void HvgDummyExposure();
-    void HvgWaitPreparedScan(unsigned sec);
-    void HvgEndScan();
-    void HvgWaitScanData(unsigned sec);
-    void HvgExpose();
-    void HvgReset();
-    void HvgReboot();
-    void HvgRequestVersion();
-    void HvgWaitVersion(unsigned sec);
+
 
     void HvgSend(const uint32_t& id, const uint64_t& request);
     void HvgSend(const uint32_t& id, const std::vector<uint8_t>& request);

@@ -1,6 +1,7 @@
 #include "socketcan.h"
 #include "exception.h"
 #include "fpgabridge.h"
+#include "xraymanager.h"
 
 #include <iostream>
 #include <ctime>
@@ -14,124 +15,47 @@ using namespace std::chrono;
 int main()
 {
     SocketCAN mySocket;
-    RCBPacket myPacket;
+    RCBPacket myRCBPacket;
     FPGABridge myFpga;
 
     try {
 
         mySocket.Init();
 
+        XrayManager myXrayManager(mySocket, myFpga);
+
         while (true) {
 
-            mySocket.GetRequest(myPacket);
+            mySocket.GetRequest(myRCBPacket);
 
-            switch (myPacket.Command) {
+            uint16_t myModule = myRCBPacket.Command >> 6;
 
-            case HV_INIT:
+            switch (myModule) {
 
-                myFpga.Init();
-
-                mySocket.PutResponse(myPacket);
+            case MODULE_GENERAL:
                 break;
 
-            case HV_START:
+            case MODULE_XRAY:
 
-                myFpga.Start();
-
-                mySocket.PutResponse(myPacket);
+                myXrayManager.ProcessRequest(myRCBPacket);
                 break;
 
-            case HV_STOP:
-
-                myFpga.Stop();
-
-                mySocket.PutResponse(myPacket);
+            case MODULE_COLLIMATOR:
                 break;
 
-            case HV_PREPARE:
-
-                if (myPacket.Parameter == 0){
-
-                    ScanParameter::TriggerMode = static_cast<uint8_t>(myPacket.Data & 0x07ul);
-                    myPacket.Data >>= 3;
-
-                    ScanParameter::ZDitherEnabled = (myPacket.Data & 0x01ul) == 0x01ul;
-                    myPacket.Data >>= 1;
-
-                    ScanParameter::XDitherEnabled = (myPacket.Data & 0x01ul) == 0x01ul;
-                    myPacket.Data >>= 1;
-
-                    ScanParameter::ImaEnabled = (myPacket.Data & 0x01ul) == 0x01ul;
-                    myPacket.Data >>= 1;
-
-                    ScanParameter::FocalSpotSize = static_cast<FSS>(myPacket.Data & 0x03ul);
-                    myPacket.Data >>= 10;
-
-                    ScanParameter::ExposureTimeInMSec = static_cast<uint32_t>(myPacket.Data & 0xfffffful);
-                    myPacket.Data >>= 24;
-
-                    ScanParameter::Ma = static_cast<uint16_t>(myPacket.Data & 0xfffful);
-                    myPacket.Data >>= 16;
-
-                    ScanParameter::Kv = static_cast<uint8_t>(myPacket.Data & 0xfful);
-
-                    ScanParameter::PreviousPacket = myPacket.Parameter;
-                }
-                else if (myPacket.Parameter == 1){
-
-                    if (ScanParameter::PreviousPacket != myPacket.Data - 1){
-
-                        throw new Exception("prepare packet out of order");
-                    }
-
-                    ScanParameter::IntegrationLimit = static_cast<uint32_t>(myPacket.Data);
-                    myPacket.Data >>= 32;
-
-                    ScanParameter::IntegrationTime = static_cast<uint32_t>(myPacket.Data);
-
-                    ScanParameter::PreviousPacket = myPacket.Parameter;
-                }
-                else if (myPacket.Parameter == 2){
-
-                    if (ScanParameter::PreviousPacket != myPacket.Data - 1){
-
-                        throw new Exception("prepare packet out of order");
-                    }
-
-                    ScanParameter::TriggerPosition = static_cast<uint32_t>(myPacket.Data >> 32);
-
-                    ScanParameter::PreviousPacket = ScanParameter::ImaEnabled? LAST_PACKET : myPacket.Parameter;
-                }
-                else{
-
-                    // dealing with imA table
-                }
-
-                if (ScanParameter::PreviousPacket == LAST_PACKET){
-
-                    myFpga.Prepare();
-
-                    myPacket.Parameter = 0;
-                    myPacket.Completed = true;
-
-                    mySocket.PutResponse(myPacket);
-                }
-
+            case MODULE_DETECTOR:
                 break;
 
-            case HV_EXPOSE:
-
-                myFpga.Expose();
-
+            case MODULE_DEBUG:
+                break;
             }
-
         }
 
 
     } catch (Exception e) {
 
-        myPacket.Completed = false;
-        mySocket.PutResponse(myPacket);
+        myRCBPacket.Completed = false;
+        mySocket.PutResponse(myRCBPacket);
         cout << e.Message() << endl;
     }
 

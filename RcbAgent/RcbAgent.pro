@@ -13,7 +13,8 @@ SOURCES += \
     socketcan.cpp \
     log.cpp \
     scanparameter.cpp \
-    rcbpacket.cpp
+    rcbpacket.cpp \
+    xraymanager.cpp
 
 HEADERS += \
     register.h \
@@ -23,4 +24,5 @@ HEADERS += \
     socketcan.h \
     log.h \
     scanparameter.h \
-    rcbpacket.h
+    rcbpacket.h \
+    xraymanager.h

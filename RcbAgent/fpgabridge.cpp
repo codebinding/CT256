@@ -61,58 +61,13 @@ void FPGABridge::WriteRegister(uint16_t offset, uint64_t value){
     *myRegister = value;
 }
 
-void FPGABridge::Init(){
 
-    Log::Print("Init ...");
 
-    std::time_t myNow = std::time(nullptr);
-    std::tm *myLocalTime = std::localtime(&myNow);
 
-    uint8_t myYear = static_cast<uint8_t>(myLocalTime->tm_year - 100);
-    uint8_t myMonth = static_cast<uint8_t>(myLocalTime->tm_mon + 1);
-    uint8_t myDay = static_cast<uint8_t>(myLocalTime->tm_mday);
-    uint8_t myHour = static_cast<uint8_t>(myLocalTime->tm_hour);
-    uint8_t myMinute = static_cast<uint8_t>(myLocalTime->tm_min);
-    uint8_t mySecond = static_cast<uint8_t>(myLocalTime->tm_sec);
 
-    AdbAuthenticateBegin(myYear, myMonth, myDay, myHour, myMinute, mySecond);
 
-    AdbAuthenticateStatus();
-
-    HvgWaitOnCommunication(20);
-
-    HvgSetTime(myYear, myMonth, myDay, myHour, myMinute, mySecond);
-
-    HvgInitialize();
-
-    HvgWaitOnStandby(20);
-
-    Log::Print("Init Done");
-}
-
-void FPGABridge::Start(){
-
-    Log::Print("Start ...");
-
-    HvgDummyExposure();
-
-    HvgWaitPreparedScan(2);
-
-    Log::Print("Start Done");
-}
-
-void FPGABridge::Stop(){
-
-    Log::Print("Stop ...");
-
-    HvgEndScan();
-
-    Log::Print("Stop Done");
-}
 
 void FPGABridge::Prepare(){
-
-    Log::Print("Prepare ...");
 
     m_Register->ExposureTime = ScanParameter::ExposureTimeInMSec;
     m_Register->TriggerMode = ScanParameter::TriggerMode;
@@ -141,9 +96,7 @@ void FPGABridge::Prepare(){
     }
 
     HvgModeData();
-    HvgWaitPreparedScan(10);
-
-    Log::Print("Prepare Done");
+    HvgWaitPreparedScan(10); 
 }
 
 void FPGABridge::Expose(){
@@ -996,7 +949,7 @@ void FPGABridge::HvgWaitScanData(unsigned sec){
     throw new Exception("[HVG] timeout receiving 'Scan Data'");
 }
 
-void FPGABridge::HvgExpose(){
+void FPGABridge::HvgArm(){
 
     Log::Print( "Entering ", __func__ );
 
@@ -1027,6 +980,18 @@ void FPGABridge::HvgExpose(){
 
         usleep(1000);
     }
+
+    Log::Print( "Entering ", __func__ );
+}
+
+void FPGABridge::HvgExpose(){
+
+    Log::Print( "Entering ", __func__ );
+
+    uint32_t myId;
+    std::vector<uint8_t> myResponse;
+
+    system_clock::time_point timeout = system_clock::now() + milliseconds(1000);
 
     // X-Ray is On
     std::cout << "\033[33m" << "== X-Ray is On ==" << "\033[0m" << std::endl;

@@ -32,9 +32,6 @@ SocketCAN::~SocketCAN(){
     ::pthread_cond_destroy(&m_RequestReadySignal);
     ::pthread_cond_destroy(&m_ResponseReadySignal);
 
-    //delete m_RequestQueue;
-    //delete m_ResponseQueue;
-
     if( isValid() ){
 
         ::close( m_sock );
@@ -44,9 +41,6 @@ SocketCAN::~SocketCAN(){
 void SocketCAN::Init(){
 
     openCAN(const_cast<char *>("can0"));
-
-    //m_RequestQueue = new std::queue<CANPacket>();
-    //m_ResponseQueue = new std::queue<CANPacket>();
 
     // Initialize mutex and signals of the 'request queue'
     ::pthread_mutex_init(&m_RequestMutex, nullptr);
@@ -168,6 +162,7 @@ void SocketCAN::PutResponse(RCBPacket &packet){
 
     CANPacket myPacket;
     packet.EncodeCANPacket(myPacket);
+
     m_ResponseQueue.push(myPacket);
 
     ::pthread_cond_signal(&m_ResponseReadySignal);

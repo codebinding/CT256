@@ -4,6 +4,11 @@
 #include <sstream>
 #include <iomanip>
 
+CANPacket::CANPacket()
+    : m_id(0), m_data64(0){
+
+}
+
 uint32_t CANPacket::GetId(){
 
     return m_id;
@@ -13,29 +18,34 @@ void CANPacket::GetData(uint8_t data[8]){
 
     for(int i = 0; i < 8; i++){
 
-        data[i] = m_data[i];
+        data[i] = m_data8[i];
     }
 }
 
-void CANPacket::SetId(uint32_t id){
+void CANPacket::GetData(uint64_t& data){
+
+    data = m_data64;
+}
+
+void CANPacket::SetId(const uint32_t id){
 
     m_id = id;
 }
 
-void CANPacket::SetData(uint8_t data[8]){
+void CANPacket::SetData(const uint8_t data[8]){
 
     for(int i = 0; i < 8; i++){
 
-        m_data[i] = data[i];
+        m_data8[i] = data[i];
     }
 }
 
-void CANPacket::SetRawPacket(can_frame frame){
+void CANPacket::SetRawPacket(const can_frame& frame){
 
     m_id = frame.can_id & CAN_EFF_MASK;
     for(int i = 0; i < 8; i++){
 
-        m_data[i] = frame.data[i];
+        m_data8[i] = frame.data[i];
     }
 }
 
@@ -47,43 +57,29 @@ std::string CANPacket::ToString(){
 
     for(int i = 0; i < 8; i++){
 
-        oss << std::setw(2) << std::setfill('0') << static_cast<int>(m_data[i]) << ((i!=7) ? "-" : "");
+        oss << std::setw(2) << std::setfill('0') << static_cast<int>(m_data8[i]) << ((i!=7) ? "-" : "");
     }
 
     return oss.str();
 }
 
-void CANPacket::SetFrame(uint32_t id, uint8_t data[]){
+void CANPacket::SetFrame(const uint32_t id, const uint8_t data[]){
 
     m_id = id;
 
     for(int i = 0; i < 8; i++){
 
-        m_data[i] = data[i];
+        m_data8[i] = data[i];
     }
 }
 
-void CANPacket::SetFrame(uint32_t id, uint32_t data[]){
+void CANPacket::SetFrame(const uint32_t id, const uint64_t data){
 
     m_id = id;
-
-    for(int i = 0; i < 8; i++){
-
-        m_data[i] = static_cast<uint8_t>(data[i]);
-    }
+    m_data64 = data;
 }
 
-void CANPacket::SetFrame(uint32_t id, uint64_t data){
-
-    m_id = id;
-
-    for(int i = 0; i < 8; i++){
-
-        m_data[i] = static_cast<uint8_t>(data >> ((7 - i) * 8));
-    }
-}
-
-void CANPacket::SetFrame(uint32_t id, uint8_t start_bit, uint8_t bit_length, uint64_t data){
+void CANPacket::SetFrame(const uint32_t id, const uint8_t start_bit, const uint8_t bit_length, const uint64_t data){
 
     if( start_bit > 63 ){
 
@@ -104,10 +100,5 @@ void CANPacket::SetFrame(uint32_t id, uint8_t start_bit, uint8_t bit_length, uin
 
     uint64_t my_mask = (0x01ul << bit_length) - 1;
 
-    data = (data & my_mask) << (start_bit - bit_length + 1);
-
-    for(int i = 0; i < 8; i++){
-
-        m_data[i] = m_data[i] | static_cast<uint8_t>(data >> ((7 - i) * 8));
-    }
+    m_data64 = m_data64 | (data & my_mask) << start_bit;
 }
